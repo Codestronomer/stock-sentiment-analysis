@@ -37,12 +37,11 @@ for ticker in tickers:
 #   print(f'{timestamp}:  {title}')
 
 def parse_date(date_str):
-    if date_str == "Today":
-        return datetime.now().date()
-    elif date_str == "Yesterday":
-        return (datetime.now() - timedelta(1)).date()
-    else:
-        return pd.to_datetime(date_str).date()
+    try:
+        pd.to_datetime(date_str).date()
+    except ValueError:
+        print(date_str)
+        return None
      
 
 parsed_data = []
@@ -73,7 +72,10 @@ def fetch_stock_data(ticker):
 
 all_stock_data = pd.concat([fetch_stock_data(ticker) for ticker in tickers])
 print(all_stock_data.head())
+
 all_stock_data.reset_index(inplace=True)
+
+all_stock_data['Date'] = pd.to_datetime(all_stock_data['Date'])
 all_stock_data['date'] = all_stock_data['Date'].dt.date
 
 # Merge sentiment data with stock data
